@@ -1,5 +1,6 @@
 package cn.noy.kaboom.app;
 
+import cn.noy.kaboom.common.PlayerController;
 import cn.noy.kaboom.model.Game;
 import cn.noy.kaboom.model.event.BombExplodeEvent;
 import cn.noy.kaboom.model.event.EntityRemoveEvent;
@@ -32,6 +33,10 @@ public class KaboomLauncher {
 
         window.addView(worldView);
         window.display();
+
+        PlayerController controller = new PlayerController();
+        window.setPlayerController(controller);
+        Game.getInstance().getPlayer().setController(controller);
     }
 
     @EventHandler(priority = EventHandler.Priority.HIGHEST, ignoreCanceled = true)

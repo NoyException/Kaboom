@@ -1,9 +1,7 @@
 package cn.noy.kaboom.view;
 
 import cn.noy.kaboom.common.Direction;
-import cn.noy.kaboom.common.EntityType;
-import cn.noy.kaboom.model.Game;
-import cn.noy.kaboom.model.entity.Player;
+import cn.noy.kaboom.common.PlayerController;
 import cn.noy.kaboom.view.animation.Animation;
 import com.google.common.collect.TreeMultimap;
 
@@ -12,10 +10,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.util.*;
-import java.util.List;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 public class Window {
     private final TreeMultimap<Integer, View> views = TreeMultimap.create(Comparator.comparingInt((Integer i) -> i), Comparator.comparingInt(Object::hashCode));
@@ -24,6 +21,7 @@ public class Window {
     private boolean isRunning = false;
     private final LinkedList<Integer> pressedKeys = new LinkedList<>();
     private final ConcurrentLinkedQueue<View> toAdd = new ConcurrentLinkedQueue<>();
+    private PlayerController playerController;
 
     public Window() {
         this.frame = new JFrame();
@@ -35,7 +33,9 @@ public class Window {
             @Override
             public void keyTyped(KeyEvent e) {
                 if(e.getKeyChar() == ' '){
-                    Game.getInstance().getPlayer().placeBomb();
+                    if(playerController!=null){
+                        playerController.setToPlaceBomb(true);
+                    }
                 }
             }
 
@@ -43,11 +43,27 @@ public class Window {
             public void keyPressed(KeyEvent e) {
                 pressedKeys.remove((Integer) e.getKeyCode());
                 pressedKeys.addFirst(e.getKeyCode());
+                notifyKeyChanged();
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
                 pressedKeys.remove((Integer) e.getKeyCode());
+                notifyKeyChanged();
+            }
+
+            public void notifyKeyChanged(){
+                if(playerController==null) return;
+                LinkedList<Direction> directions = new LinkedList<>();
+                for (Integer key : pressedKeys) {
+                    switch (key){
+                        case KeyEvent.VK_W -> directions.addLast(Direction.UP);
+                        case KeyEvent.VK_S -> directions.addLast(Direction.DOWN);
+                        case KeyEvent.VK_A -> directions.addLast(Direction.LEFT);
+                        case KeyEvent.VK_D -> directions.addLast(Direction.RIGHT);
+                    }
+                }
+                playerController.setDirections(directions);
             }
         });
 
@@ -55,19 +71,6 @@ public class Window {
         panel.setDoubleBuffered(true);
         panel.setSize(16*32, 16*32);
         frame.add(panel);
-
-        Game.getInstance().getScheduler().schedule(task -> {
-            LinkedList<Direction> directions = new LinkedList<>();
-            for (Integer key : pressedKeys) {
-                switch (key){
-                    case KeyEvent.VK_W -> directions.addLast(Direction.UP);
-                    case KeyEvent.VK_S -> directions.addLast(Direction.DOWN);
-                    case KeyEvent.VK_A -> directions.addLast(Direction.LEFT);
-                    case KeyEvent.VK_D -> directions.addLast(Direction.RIGHT);
-                }
-            }
-            Game.getInstance().getPlayer().setControlDirections(directions);
-        },1,1);
     }
 
     public void display(){
@@ -86,6 +89,10 @@ public class Window {
                 }
             }
         }).start();
+    }
+
+    public void setPlayerController(PlayerController playerController) {
+        this.playerController = playerController;
     }
 
     public void close(){
