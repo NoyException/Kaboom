@@ -23,7 +23,7 @@ public class Bomb extends AbstractBomb{
     @Override
     public void explode(){
         BombExplodeEvent event = new BombExplodeEvent(this);
-        Game.getInstance().getEventManager().callEvent(event);
+        event.call();
         if(event.isCanceled()) return;
 
         power = event.getPower();

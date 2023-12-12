@@ -138,7 +138,7 @@ public abstract class Entity {
 
     public void setInvisible(boolean invisible) {
         EntityPropertyChangedEvent event = new EntityPropertyChangedEvent(this, "invisible", this.invisible, invisible);
-        Game.getInstance().getEventManager().callEvent(event);
+        event.call();
         if(!event.isCanceled())
             this.invisible = (boolean) event.getNewValue();
     }
@@ -176,7 +176,7 @@ public abstract class Entity {
     public void remove() {
         if (removed) return;
         EntityRemoveEvent event = new EntityRemoveEvent(this);
-        Game.getInstance().getEventManager().callEvent(event);
+        event.call();
 
         removed = true;
         getWorld().remove(this);

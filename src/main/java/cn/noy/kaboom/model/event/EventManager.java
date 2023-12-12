@@ -80,7 +80,7 @@ public class EventManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Event> void callEvent(T event) {
+    <T extends Event> void callEvent(T event) {
         if(callEventDepth == 0) {
             update();
         }

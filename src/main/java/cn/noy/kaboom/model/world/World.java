@@ -120,7 +120,7 @@ public class World {
     public boolean spawnEntity(Entity entity, double x, double y){
         Location location = Location.of(this, x, y);
         EntitySpawnEvent event = new EntitySpawnEvent(entity, location);
-        Game.getInstance().getEventManager().callEvent(event);
+        event.call();
         if(event.isCanceled()) return false;
 
         entity.setLocation(event.getSpawnLocation());
