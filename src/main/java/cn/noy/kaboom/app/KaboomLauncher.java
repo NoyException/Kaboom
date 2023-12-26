@@ -1,7 +1,9 @@
 package cn.noy.kaboom.app;
 
+import cn.noy.kaboom.common.Direction;
 import cn.noy.kaboom.common.PlayerController;
 import cn.noy.kaboom.model.Game;
+import cn.noy.kaboom.model.entity.Bomb;
 import cn.noy.kaboom.model.event.BombExplodeEvent;
 import cn.noy.kaboom.model.event.EntityRemoveEvent;
 import cn.noy.kaboom.model.event.EntitySpawnEvent;
@@ -17,7 +19,7 @@ public class KaboomLauncher {
     private Window window;
 
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        System.out.println("Starting...");
         KaboomLauncher launcher = new KaboomLauncher();
         launcher.launch();
     }
@@ -37,6 +39,11 @@ public class KaboomLauncher {
         PlayerController controller = new PlayerController();
         window.setPlayerController(controller);
         Game.getInstance().getPlayer().setController(controller);
+
+//        Game.getInstance().getScheduler().schedule(task->{
+////            Game.getInstance().getPlayer().move(Direction.LEFT);
+////            Game.getInstance().getPlayer().placeBomb();
+//        },100,1);
     }
 
     @EventHandler(priority = EventHandler.Priority.HIGHEST, ignoreCanceled = true)
@@ -51,4 +58,11 @@ public class KaboomLauncher {
     public void onExplode(BombExplodeEvent event){
         window.playAnimation(new ExplosionAnimation(event.getEntity().getExplosionArea()));
     }
+
+//    @EventHandler
+//    public void test(EntitySpawnEvent event){
+//        if(event.getEntity() instanceof Bomb bomb){
+//            bomb.setPower(100);
+//        }
+//    }
 }
